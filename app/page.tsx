@@ -79,7 +79,9 @@ export default function Home() {
           type="button"
           variant="outline"
           onClick={()=> {
-            console.log(selectedIds)
+            fetch("/api/export/run", {
+              method: "post",
+            })
           }}
           className="uppercase text-sm rounded-sm w-60 mt-2 lg:w-full" loading={loading}>
             Generate
