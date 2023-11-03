@@ -3,6 +3,7 @@ export interface FolderData {
 }
 
 export interface Folder {
+  foldersOpen: any;
   id:                string;
   name:              string;
   orderindex:        number;
@@ -17,6 +18,7 @@ export interface Folder {
 }
 
 export interface List {
+  reportsOpen: any;
   id:                string;
   name:              string;
   orderindex:        number | null;

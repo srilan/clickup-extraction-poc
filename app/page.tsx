@@ -1,7 +1,4 @@
 "use client"
-
-import Folders from '@/components/folders';
-import { Button } from '@/components/ui/button';
 import { Space, SpacesData } from '@/models/spaces';
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
@@ -43,13 +40,14 @@ export default function Home() {
     const fetchData = async () => {
       const response = await fetch('/api/list/get');
       const listData: ListData = await response.json();
+      console.log('Lists data:', listData);
       setList(listData.lists);
     };
     fetchData();
     
   }, []);
 
-  const toggleReports = async (spaceId: string, index: number) => {
+  const toggleSpaces = async (spaceId: string, index: number) => {
     if (!workspaceFolders[spaceId]) {
       const response = await fetch(`/api/folder/get?spaceId=${spaceId}`);
       const folderData: FolderData = await response.json();
@@ -65,9 +63,9 @@ export default function Home() {
         const updatedSpace = { ...space };
   
         if (i === index) {
-          updatedSpace.reportsOpen = !updatedSpace.reportsOpen;
-        } else if (updatedSpace.reportsOpen) {
-          updatedSpace.reportsOpen = false;
+          updatedSpace.spacesOpen = !updatedSpace.spacesOpen;
+        } else if (updatedSpace.spacesOpen) {
+          updatedSpace.spacesOpen = false;
         }
   
         return updatedSpace;
@@ -75,35 +73,40 @@ export default function Home() {
     );
   };
   
-  const toggleSubReports = async (folderId: string, index: number) => {
+  const toggleFolders = async (folderId: string, index: number) => {
     if (!folderLists[folderId]) {
       const response = await fetch(`/api/list/get?folderId=${folderId}`);
       const listData: ListData = await response.json();
-
+  
       setFolderLists((prevFolderLists) => ({
         ...prevFolderLists,
         [folderId]: listData.lists,
       }));
-     
+    }
+  
     setFolder((prevFolders) =>
-    prevFolders.map((folder, i) => {
-      const updatedFolder = { ...folder };
-
-      if (i === index) {
-        updatedFolder.reportsOpen = !updatedFolder.reportsOpen;
-      } else if (updatedFolder.reportsOpen) {
-        updatedFolder.reportsOpen = false;
-      }
-
-      return updatedFolder;
-    })
-  );
-  }};
+      prevFolders.map((folder, i) => {
+        const updatedFolder = { ...folder };
+  
+        if (i === index) {
+          updatedFolder.foldersOpen = !updatedFolder.foldersOpen;
+        } else if (updatedFolder.foldersOpen) {
+          updatedFolder.foldersOpen = false;
+        }
+  
+        return updatedFolder;
+      })
+    );
+  };
+  
+  
 
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
-    <div className="relative color flex place-items-center before:absolute before:h-[0px] before:w-[0px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-green-600 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#4fa79f] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
+    <div 
+    // className="relative color flex place-items-center before:absolute before:h-[0px] before:w-[0px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-green-600 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#4fa79f] after:dark:opacity-40 before:lg:h-[360px] z-[-1]"
+    >
       <Image
         className="relative"
         src="/trajector.png"
@@ -117,10 +120,12 @@ export default function Home() {
       <div className="items-center mb-32 grid text-center lg:w-full lg:mb-0 lg:text-left">
       <SpacesList
           spaces={spaces}
+          folders={folders}
+          lists={lists}
           workspaceFolders={workspaceFolders}
           folderLists={folderLists}
-          toggleReports={toggleReports}
-          toggleSubReports={toggleSubReports}
+          toggleSpaces={toggleSpaces}
+          toggleFolders={toggleFolders}
         />
       
       </div>

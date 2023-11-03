@@ -10,21 +10,25 @@ interface SelectedId {
 }
 
 interface FoldersListProps {
+  foldersL: Folder[];
   folders: Folder[];
+  lists: List[];
   folderLists: { [key: string]: List[] };
-  toggleSubReports: (folderId: string, index: number) => void;  
+  toggleFolders: (folderId: string, index: number) => void;  
 }
 
-const FoldersList: React.FC<FoldersListProps> = ({ folders, folderLists, toggleSubReports }) => {
+const FoldersList: React.FC<FoldersListProps> = ({ foldersL, folders, lists, folderLists, toggleFolders }) => {
+
+  console.log('Lists in FoldersList:', foldersL);
 
   const [selectedIds, setSelectedIds] = useState<SelectedId[]>([]);
   return (
     
     <div>
-      {folders.map((folder, index) => (
+      {foldersL.map((folder, index) => (
         
         <div key={index}>
-           <div className="flex items-center" style={{ marginLeft: '-1.5rem', display: 'flex', marginBottom: '-1.3rem'}} >
+           {/* <div className="flex items-center" style={{ marginLeft: '-1.5rem', display: 'flex', marginBottom: '-1.3rem'}} >
             <input 
               id="checked-checkbox" 
               type="checkbox" 
@@ -38,13 +42,13 @@ const FoldersList: React.FC<FoldersListProps> = ({ folders, folderLists, toggleS
               checked={selectedIds[folder.id]}
               className="w-4 h-4 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             />
-          </div>
+          </div> */}
 
           <div
             className="flex text-gray-600 w-full border-b overflow-hidden mt-32 md:mt-0 mb-5 mx-auto"
-            onClick={() => toggleSubReports(folder.id, index)}
+            onClick={() => toggleFolders(folder.id, index)}
           >
-            <div className={`w-10 border-r px-2 transform transition duration-500 ease-in-out ${folder.reportsOpen ? 'rotate-180' : ''}`}>
+            <div className={`w-10 border-r px-2 transform transition duration-500 ease-in-out ${folder.foldersOpen ? 'rotate-180' : ''}`}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 15.75l-7.5-7.5-7.5 7.5" />
               </svg>
@@ -57,10 +61,10 @@ const FoldersList: React.FC<FoldersListProps> = ({ folders, folderLists, toggleS
             </div>
           </div>
 
-          {folder.reportsOpen && (
+          {folder.foldersOpen && (
             <div className="flex p-5 md:p-0 w-full transform transition duration-500 ease-in-out border-b pb-10">
               <div style={{ marginLeft: '4rem', paddingBottom: '1rem', fontFamily: 'Verdana' }}>
-                <ListTasks lists={folderLists[folder.id] || []} listTasks={{}} toggleSubReports={toggleSubReports}
+                <ListTasks listsL={folderLists[folder.id] || []} lists={lists} listTasks={{}} toggleFolders={toggleFolders}
                            />
               </div>
             </div>

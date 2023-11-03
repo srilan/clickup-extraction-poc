@@ -14,19 +14,23 @@ interface SelectedId {
 
 interface SpacesListProps {
   spaces: Space[];
+  folders: Folder[];
+  lists: List[];
   workspaceFolders: { [key: string]: Folder[] };
   folderLists: { [key: string]: List[] };
-  toggleReports: (spaceId: string, index: number) => void;
-  toggleSubReports: (folderId: string, index: number) => void;
+  toggleSpaces: (spaceId: string, index: number) => void;
+  toggleFolders: (folderId: string, index: number) => void;
 }
 
 
 const SpacesList: React.FC<SpacesListProps> = ({
   spaces,
+  folders,
+  lists,
   workspaceFolders,
   folderLists,
-  toggleReports,
-  toggleSubReports,
+  toggleSpaces,
+  toggleFolders,
 }) => {
 
   const [selectedIds, setSelectedIds] = useState<SelectedId[]>([]);
@@ -38,7 +42,7 @@ const SpacesList: React.FC<SpacesListProps> = ({
     <thead>
       <tr>
         <th></th>
-        <th style={{ fontFamily: 'Verdana', color: '#526E8E', display: 'flex', marginBottom: 30, marginLeft: 50 }}>
+        <th style={{ fontFamily: 'Verdana', color: '#526E8E', display: 'flex', marginBottom: 30, marginLeft: "-720%" }}>
           Name
         </th>
       </tr>
@@ -47,7 +51,7 @@ const SpacesList: React.FC<SpacesListProps> = ({
     <tbody style={{ width: 'max-content' }}>
     {spaces.map((space, index) => (
         <tr key={index}>
-          <td style={{ width: '1%'}}>
+          {/* <td style={{ width: '1%'}}>
           <div className="flex items-center" >
             <input 
               id="checked-checkbox" 
@@ -63,13 +67,13 @@ const SpacesList: React.FC<SpacesListProps> = ({
               className="w-4 h-4 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             />
           </div>
-          </td>
+          </td> */}
           <td>
             <div
               className="flex items-center text-gray-600 w-full border-b overflow-hidden mt-32 md:mt-0 mb-5 mx-auto"
-              onClick={() => toggleReports(space.id, index)}
+              onClick={() => toggleSpaces(space.id, index)}
             >
-              <div className={`w-10 border-r px-2 transform transition duration-500 ease-in-out ${space.reportsOpen ? 'rotate-180' : ''}`}>
+              <div className={`w-10 border-r px-2 transform transition duration-500 ease-in-out ${space.spacesOpen ? 'rotate-180' : ''}`}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 15.75l-7.5-7.5-7.5 7.5" />
                 </svg>
@@ -82,11 +86,11 @@ const SpacesList: React.FC<SpacesListProps> = ({
               </div>
             </div>
 
-            {space.reportsOpen && (
+            {space.spacesOpen && (
               <div className="flex p-5 md:p-0 w-full transform transition duration-500 ease-in-out border-b pb-10">
                 <div style={{ marginLeft: '4rem', paddingBottom: '1rem', fontFamily: 'Verdana' }}>
-                  <FoldersList folders={workspaceFolders[space.id] || []} folderLists={folderLists} 
-                  toggleSubReports={toggleSubReports} 
+                  <FoldersList foldersL={workspaceFolders[space.id] || []} folders={folders} lists={lists} folderLists={folderLists} 
+                  toggleFolders={toggleFolders} 
                   />
                 </div>
               </div>

@@ -3,6 +3,7 @@ export interface SpacesData {
 }
 
 export interface Space {
+  spacesOpen:        any;
   id:                 string;
   name:               string;
   color:              null | string;

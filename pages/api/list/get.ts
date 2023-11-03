@@ -11,7 +11,7 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   const { folderId } = req.query;
-  const listsEndPoint = `${clickUpEndPoint}/folder/${folderId}/list?archived=false`;
+  const listsEndPoint = `${clickUpEndPoint}/folder/90100242172/list?archived=false`;
   const data = await fetch(listsEndPoint, {
     headers: {
       Authorization: `${process.env.NEXT_CLICKUP_PUBLIC_KEY}`
