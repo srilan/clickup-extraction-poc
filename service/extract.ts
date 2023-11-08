@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { Task } from './model';
 /**
  * This is the main extractor service.
  * This can be converted into a standalone app.
@@ -8,11 +9,18 @@ import { join } from 'path';
 export const clickUpEndPoint = process.env.NEXT_CLICKUP_URL || '';
 
 
-export const extractByTask = async (id: string) => {
+export const getListsByFolder = async (folderId: string) => {
+  const taskEndPoint = `${clickUpEndPoint}/folder/${folderId}?archived=false`;
+  const data = await fetch(taskEndPoint, {
+    headers: {
+      Authorization: `${process.env.NEXT_CLICKUP_PUBLIC_KEY}`
+    }
+  })
+  const taskData = await data.json();
+  return taskData;
+}
 
-  /**
-   * get task details
-   */
+export const extractByTask = async (id: string) => {
   const taskEndPoint = `${clickUpEndPoint}/task/${id}?archived=false`;
   const data = await fetch(taskEndPoint, {
     headers: {
@@ -38,15 +46,51 @@ export const extractByList = async (id: string) => {
   return list;
 }
 
-export const writeExtracted = async (data: [], filename: string) => {
-  const location = join(__dirname, `${filename}.json`)
-  console.log("loc", location)
-  await writeFileSync(location, JSON.stringify(data), {
+const formatData = (data: any) => {
+  const newData: Task = {
+    id: data.id,
+    custom_id: data.custom_id,
+    name: data.name,
+    description: data.description,
+    status_status: data.status.status,
+    date_created: data.date_created,
+    date_updated: data.date_updated,
+    date_closed: data.date_closed,
+    date_done: data.date_done,
+    archived: data.archived,
+    creator_email: data.creator.email,
+    assignees_email: data.assignees.email,
+    watchers_email: data.watchers.email,
+    parent: data.watchers.parent,
+    priority: data.watchers.priority,
+    due_date: data.watchers.due_date,
+    start_date: data.watchers.start_date,
+    points: data.watchers.points,
+    time_estimate: data.watchers.time_estimate,
+    time_spent: data.watchers.time_spent,
+    home_list: data.locations.name,
+    list_name: data.list.name,
+  }
+  return newData;
+}
+
+export const writeExtracted = async (data: any[], fileName: string) => {
+  fileName = fileName.replaceAll(" ", "_");
+  fileName = fileName.replace(/[/\\?%*:|"<>]/g, '-');
+  const tasks = data.map(d=>formatData(d));
+  const location = join(__dirname, `${fileName}.json`)
+  await writeFileSync(location, JSON.stringify(tasks), {
     flag: 'w',
   });
 }
 
-export const extract = async (listId: string) => {
-  const list = await extractByList(listId);
-  await writeExtracted(list.tasks, list.id);
+export const extract = async (folderId: string) => {
+  const { lists, name } = await getListsByFolder(folderId);
+  const tasks: any[] = [];
+  lists.map(async (l: any)=> {
+    const list = await extractByList(l.id);
+    tasks.concat(list.tasks);
+    console.log("list", tasks)
+  })
+  await writeExtracted(tasks, name);
 }
