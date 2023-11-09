@@ -2,8 +2,12 @@ export interface FolderData {
   folders: Folder[];
 }
 
+export interface ListData {
+  lists: List[];
+}
+
 export interface Folder {
-  foldersOpen: any;
+  reportsOpen: any;
   id:                string;
   name:              string;
   orderindex:        number;

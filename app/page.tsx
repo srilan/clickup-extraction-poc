@@ -1,10 +1,10 @@
 "use client"
-
-import Folders from '@/components/folders';
-import { Button } from '@/components/ui/button';
 import { Space, SpacesData } from '@/models/spaces';
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
+import { Folder, FolderData } from '@/models/folder';
+import { List, ListData } from '@/models/list';
+import SpacesList from './spaces/SpacesList';
 
 interface SelectedId {
   id: string,
@@ -12,9 +12,13 @@ interface SelectedId {
 }
 
 export default function Home() {
-  const [spaces, setSpaces] = useState<Array<Space>>([]);
   const [selectedIds, setSelectedIds] = useState<SelectedId[]>([]);
   const [loading, setLoading] = useState(false);
+  const [spaces, setSpaces] = useState<Array<Space>>([]);
+  const [folders, setFolder] = useState<Array<Folder>>([]);
+  const [lists, setList] = useState<Array<List>>([]);
+  const [workspaceFolders, setWorkspaceFolders] = useState<{ [key: string]: Folder[] }>({});
+  const [folderLists, setFolderLists] = useState<{ [key: string]: List[] }>({});
 
   useEffect(()=> {
     fetch("/api/spaces/get").then(async (data)=> {
@@ -22,70 +26,108 @@ export default function Home() {
       setSpaces(spacesData.spaces);
     })
   }, [])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch('/api/folder/get');
+      const folderData: FolderData = await response.json();
+      setFolder(folderData.folders);
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch('/api/list/get');
+      const listData: ListData = await response.json();
+      console.log('Lists data:', listData);
+      setList(listData.lists);
+    };
+    fetchData();
+    
+  }, []);
+
+  const toggleSpaces = async (spaceId: string, index: number) => {
+    if (!workspaceFolders[spaceId]) {
+      const response = await fetch(`/api/folder/get?spaceId=${spaceId}`);
+      const folderData: FolderData = await response.json();
+  
+      setWorkspaceFolders((prevWorkspaceFolders) => ({
+        ...prevWorkspaceFolders,
+        [spaceId]: folderData.folders,
+      }));
+    }
+  
+    setSpaces((prevSpaces) =>
+      prevSpaces.map((space, i) => {
+        const updatedSpace = { ...space };
+  
+        if (i === index) {
+          updatedSpace.spacesOpen = !updatedSpace.spacesOpen;
+        } else if (updatedSpace.spacesOpen) {
+          updatedSpace.spacesOpen = false;
+        }
+  
+        return updatedSpace;
+      })
+    );
+  };
+  
+  const toggleFolders = async (folderId: string, index: number) => {
+    if (!folderLists[folderId]) {
+      const response = await fetch(`/api/list/get?folderId=${folderId}`);
+      const listData: ListData = await response.json();
+  
+      setFolderLists((prevFolderLists) => ({
+        ...prevFolderLists,
+        [folderId]: listData.lists,
+      }));
+    }
+  
+    setFolder((prevFolders) =>
+      prevFolders.map((folder, i) => {
+        const updatedFolder = { ...folder };
+  
+        if (i === index) {
+          updatedFolder.foldersOpen = !updatedFolder.foldersOpen;
+        } else if (updatedFolder.foldersOpen) {
+          updatedFolder.foldersOpen = false;
+        }
+  
+        return updatedFolder;
+      })
+    );
+  };
+  
+  
+
+
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/trajector.png"
-          alt="Trajector Logo"
-          width={180}
-          height={40}
-          priority
-        />
-      </div>
+    <div 
+    // className="relative color flex place-items-center before:absolute before:h-[0px] before:w-[0px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-green-600 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#4fa79f] after:dark:opacity-40 before:lg:h-[360px] z-[-1]"
+    >
+      <Image
+        className="relative"
+        src="/trajector.png"
+        alt="Trajector Logo"
+        width={360}
+        height={80}
+        priority
+      />
+    </div>
 
-      <div className="flex items-center mb-32 grid text-center lg:w-full lg:mb-0 lg:text-left">
-        <table className="hover:table-fixed border-collapse border border-slate-400 ">
-          <thead>
-            <tr>
-              <th className='border border-slate-400'></th>
-              <th className='border border-slate-400'>Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              spaces.map((space, i)=> {
-                return (
-                  <>
-                    <tr key={i}>
-                      <td>
-                        <div className="flex items-center">
-                          <input 
-                            id="checked-checkbox" 
-                            type="checkbox" 
-                            onChange={(e)=>{
-                              selectedIds[i] = {
-                                selected: e.target.checked,
-                                id: space.id
-                              }
-                              setSelectedIds(selectedIds)
-                            }}
-                            checked={selectedIds[space.id]}
-                            className="w-4 h-4 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                          />
-                        </div>
-                      </td>
-                      <td>{space.name}</td>
-                    </tr>
-                  </>
-                )
-              })
-            }
-          </tbody>
-        </table>
-        
-        <Button 
-          type="button"
-          variant="outline"
-          onClick={()=> {
-            fetch("/api/export/run", {
-              method: "post",
-            })
-          }}
-          className="uppercase text-sm rounded-sm w-60 mt-2 lg:w-full" loading={loading}>
-            Generate
-        </Button>
+      <div className="items-center mb-32 grid text-center lg:w-full lg:mb-0 lg:text-left">
+      <SpacesList
+          spaces={spaces}
+          folders={folders}
+          lists={lists}
+          workspaceFolders={workspaceFolders}
+          folderLists={folderLists}
+          toggleSpaces={toggleSpaces}
+          toggleFolders={toggleFolders}
+        />
+      
       </div>
     </main>
   )
