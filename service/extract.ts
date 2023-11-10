@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { Task } from './model';
 import { ProductOrCapabilityOptions, TaskTypeOptions, TeamsOptions, customFields } from './configs';
+import { json2csv } from 'json-2-csv';
 /**
  * This is the main extractor service.
  * This can be converted into a standalone app.
@@ -108,16 +109,18 @@ export const addCustomFields = (data: any) => {
 export const writeExtracted = async (data: any[], fileName: string) => {
   fileName = fileName.replaceAll(" ", "_");
   fileName = fileName.replace(/[/\\?%*:|"<>]/g, '-');
-  const tasks = data.map(d=>formatData(d));
+  /*const tasks = data.map(d=>formatData(d));
   const replacer = (key: any, value: any) => { return value === null ? '' : value } 
   const header = Object.keys(tasks[0])
   const csv = [
     header.join(','),
     ...tasks.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
   ].join('\r\n')
-
+  */
+  const tasks = data.map(d=>formatData(d))
+  const csv = json2csv(tasks);
   const location = join(__dirname, `${fileName}.csv`)
-  await writeFileSync(location, csv.toString(), {
+  await writeFileSync(location, csv, {
     flag: 'w',
   });
 }
