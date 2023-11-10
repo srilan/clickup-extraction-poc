@@ -37,7 +37,7 @@ export const extractByList = async (id: string) => {
   /**
    * get task details
    */
-  const listEndPoint = `${clickUpEndPoint}/list/${id}/task?archived=false`;
+  const listEndPoint = `${clickUpEndPoint}/list/${id}/task?archived=false&subtask=true`;
   const data = await fetch(listEndPoint, {
     headers: {
       Authorization: `${process.env.NEXT_CLICKUP_PUBLIC_KEY}`
@@ -81,10 +81,20 @@ const formatData = (data: any) => {
     list_name:handleString(data.list.name),
   }
   const customData = addCustomFields(data);
+
+  //extract comments
+  // comments,comment_sender,comment_send_data
+  // ,"[{text:"hello"},{img:..},{text:"hi"}],hi","1@gmail.com,2@gmail.com","1212121212,12121212"
+  const comments = addComments(data);
   return {
     ...newData,
-    ...customData
+    ...customData,
   };
+}
+
+export const addComments = (Data: any) => {
+  //retrieve from api
+
 }
 
 export const addCustomFields = (data: any) => {
