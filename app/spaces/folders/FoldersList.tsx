@@ -37,7 +37,7 @@ const FolderItem = ({folder} : {folder:Folder}) => {
   const extractFolderData = (id : string, name: string) => {
     setLoading(true);
     fetch(`/api/export/download?folderId=${id}`)
-    .then( res => res.blob() )
+    .then( res => res.text())
     .then( blob => {
       //var file = window.URL.createObjectURL(blob);
       //window.location.assign(file);
@@ -69,7 +69,7 @@ const FolderItem = ({folder} : {folder:Folder}) => {
         className="flex text-gray-600 w-full border-b overflow-hidden mt-32 md:mt-0 mb-5 mx-auto"
       >
         <div className="flex px-2 py-3">
-            <button className="hover:underline" onClick={() => extractFolderData(folder.id, forlder.name)} disabled={loading}>
+            <button className="hover:underline" onClick={() => extractFolderData(folder.id, folder.name)} disabled={loading}>
               {folder.name} 
             </button>
             {loading && (
