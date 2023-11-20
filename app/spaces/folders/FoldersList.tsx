@@ -37,7 +37,7 @@ const FolderItem = ({folder} : {folder:Folder}) => {
   const extractFolderData = (id : string, name: string) => {
     setLoading(true);
     fetch(`/api/export/download?folderId=${id}`)
-    .then( res => res.blob() )
+    .then( res => res.text())
     .then( blob => {
       //var file = window.URL.createObjectURL(blob);
       //window.location.assign(file);
