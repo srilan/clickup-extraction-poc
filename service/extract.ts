@@ -183,7 +183,7 @@ export const writeExtracted = async (data: any[], fileName: string) => {
   await writeFileSync(location, csv, {
     flag: 'w',
   });
-  return location;
+  return csv;
 }
 
 export const extract = async (folderId: string) => {
