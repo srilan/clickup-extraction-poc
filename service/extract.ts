@@ -180,9 +180,9 @@ export const writeExtracted = async (data: any[], fileName: string) => {
   const doneTasks = await Promise.all(tasks);
   const csv = json2csv(doneTasks);
   const location = join(__dirname, `${fileName}.csv`)
-  await writeFileSync(location, csv, {
-    flag: 'w',
-  });
+  //await writeFileSync(location, csv, {
+  //  flag: 'w',
+  //});
   return csv;
 }
 
