@@ -58,7 +58,8 @@ const FolderItem = ({folder} : {folder:Folder}) => {
       link.click();
   
       // Clean up and remove the link
-      link.parentNode.removeChild(link);
+      if(link.parentNode)
+        link.parentNode.removeChild(link);
     }).finally(()=> {
       setLoading(false)
     });
