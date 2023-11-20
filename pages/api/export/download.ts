@@ -16,13 +16,12 @@ export default async function handler(
     const id = req.query.folderId
     if (id) {
       const fileName = await download(id as string);
-      const csvFile = fs.readFileSync(fileName);
-      console.log("csv", fileName)
+      //const csvFile = fs.readFileSync(fileName);
       res
       .status(200)
       .setHeader("Content-Type", "text/csv")
-      .setHeader("Content-Disposition", `attachment; filename=${fileName}`)
-      .send(csvFile as unknown as Data);
+      .setHeader("Content-Disposition", `attachment; filename="test.csv"`)
+      .send(fileName as unknown as Data);
     } else {
       res.status(400).json({
         message: "Invalid Folder ID"
