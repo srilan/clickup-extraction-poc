@@ -34,7 +34,7 @@ const FoldersList: React.FC<FoldersListProps> = ({ foldersL, folders, lists, fol
 
 const FolderItem = ({folder} : {folder:Folder}) => {
   const [loading, setLoading] = useState(false);
-  const extractFolderData = (id : string) => {
+  const extractFolderData = (id : string, name: string) => {
     setLoading(true);
     fetch(`/api/export/download?folderId=${id}`)
     .then( res => res.blob() )
@@ -48,7 +48,7 @@ const FolderItem = ({folder} : {folder:Folder}) => {
       link.href = url;
       link.setAttribute(
         'download',
-        `FileName.csv`,
+        `${name}_${new Date().toLocaleTimeString()}.csv`,
       );
   
       // Append to html link element page
@@ -69,7 +69,7 @@ const FolderItem = ({folder} : {folder:Folder}) => {
         className="flex text-gray-600 w-full border-b overflow-hidden mt-32 md:mt-0 mb-5 mx-auto"
       >
         <div className="flex px-2 py-3">
-            <button className="hover:underline" onClick={() => extractFolderData(folder.id)} disabled={loading}>
+            <button className="hover:underline" onClick={() => extractFolderData(folder.id, forlder.name)} disabled={loading}>
               {folder.name} 
             </button>
             {loading && (
