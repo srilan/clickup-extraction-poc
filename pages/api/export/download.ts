@@ -22,7 +22,7 @@ export default async function handler(
       .status(200)
       .setHeader("Content-Type", "text/csv")
       .setHeader("Content-Disposition", `attachment; filename=${fileName}`)
-      .send(csvFile);
+      .send(csvFile as unknown as Data);
     } else {
       res.status(400).json({
         message: "Invalid Folder ID"
