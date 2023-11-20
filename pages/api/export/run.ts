@@ -13,7 +13,10 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     const ids = req.body.spaceIds
-    extract("90110126223");
+    await extract("90110126223");
+    await extract("90020074200");
+    await extract("90050261708");
+    await extract("90020074266");
     
     res.status(200).json({
       message: "done"
