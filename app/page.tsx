@@ -119,14 +119,14 @@ export default function Home() {
 
       <div className="items-center mb-32 grid text-center lg:w-full lg:mb-0 lg:text-left">
       <SpacesList
-          spaces={spaces}
-          folders={folders}
-          lists={lists}
-          workspaceFolders={workspaceFolders}
-          folderLists={folderLists}
-          toggleSpaces={toggleSpaces}
-          toggleFolders={toggleFolders}
-        />
+        spaces={spaces}
+        folders={folders}
+        lists={lists}
+        workspaceFolders={workspaceFolders}
+        folderLists={folderLists}
+        toggleSpaces={toggleSpaces}
+        toggleFolders={toggleFolders}
+      />
       
       </div>
     </main>

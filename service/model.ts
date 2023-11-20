@@ -20,6 +20,14 @@ export interface Task {
   points: string;
   time_estimate: string;
   time_spent: string;
-  home_list: string;
+  home_list?: string;
   list_name: string;
+  comments?: string;
+}
+
+
+export interface Comment {
+  comment_text: string;
+  user: string;
+  date: string;
 }

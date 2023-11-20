@@ -22,24 +22,14 @@ const Folders = (props: FolderProps) => {
   const [folders, setFolders] = useState<Array<Folder>>([]);
   return (
     <div>
-    <table className="hover:table-fixed">
-      <thead>
-        <tr>
-          <th>Name</th>
-        </tr>
-      </thead>
-      <tbody>
-        {
-          folders.map((folder, i)=> {
-            return (
-              <tr key={i}>
-                <td>{folder.name}</td>
-              </tr>
-            )
-          })
-        }
-      </tbody>
-    </table>
+      {folders.map((folder, i)=> {
+          return (
+            <div key={i}>
+              {folder.name}
+            </div>
+          )
+        })
+      }
     </div>
   )
 }
