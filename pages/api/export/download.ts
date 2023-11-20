@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { download, extract } from '@/service/extract';
-import { clickUpEndPoint } from '@/pages/config';
+import { clickUpEndPoint } from '@/app/config/config';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import fs from "fs";
 
