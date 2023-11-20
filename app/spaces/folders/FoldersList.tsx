@@ -39,8 +39,26 @@ const FolderItem = ({folder} : {folder:Folder}) => {
     fetch(`/api/export/download?folderId=${id}`)
     .then( res => res.blob() )
     .then( blob => {
-      var file = window.URL.createObjectURL(blob);
-      window.location.assign(file);
+      //var file = window.URL.createObjectURL(blob);
+      //window.location.assign(file);
+      const url = window.URL.createObjectURL(
+        new Blob([blob]),
+      );
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute(
+        'download',
+        `FileName.csv`,
+      );
+  
+      // Append to html link element page
+      document.body.appendChild(link);
+  
+      // Start download
+      link.click();
+  
+      // Clean up and remove the link
+      link.parentNode.removeChild(link);
     }).finally(()=> {
       setLoading(false)
     });
