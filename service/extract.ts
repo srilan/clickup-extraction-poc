@@ -3,6 +3,7 @@ import { join } from 'path';
 import { Comment, Task } from './model';
 import { ProductOrCapabilityOptions, TaskTypeOptions, TeamsOptions, customFields } from './configs';
 import { json2csv } from 'json-2-csv';
+import format from 'date-fns/format';
 /**
  * This is the main extractor service.
  * This can be converted into a standalone app.
@@ -54,6 +55,20 @@ const handleString = (val: string | undefined) => {
   }
 }
 
+const formatDate = (val: string | undefined) => {
+  if (val) {
+    const dateTime = new Date(Number.parseInt(val));
+    try { 
+      const formatted = format(dateTime, 'yyyy/MM/dd HH:mm:ss');
+      return formatted;
+    } catch (e) {
+      console.log("invalid", e)
+    }
+    return "";
+  } else {
+    return '';
+  }
+}
 
 
 export const extractTaskComments = async (id: string) => {
@@ -78,18 +93,18 @@ const formatData = async (data: any) => {
     name: handleString(data.name),
     description: handleString(data.description),
     status_status: handleString(data.status.status),
-    date_created: handleString(data.date_created),
-    date_updated: handleString(data.date_updated),
-    date_closed: handleString(data.date_closed),
-    date_done: handleString(data.date_done),
+    date_created: formatDate(data.date_created),
+    date_updated: formatDate(data.date_updated),
+    date_closed: formatDate(data.date_closed),
+    date_done: formatDate(data.date_done),
     archived: handleString(data.archived.toString()),
     creator_email: handleString(data.creator.email),
     assignees_email: handleString(data.assignees.map((a: any) => a.email).toString()),
     watchers_email: handleString(data.watchers.map((a: any) => a.email).toString()),
     parent: handleString(data.parent),
     priority: handleString(data.priority?.priority),
-    due_date: handleString(data.due_date),
-    start_date: handleString(data.start_date),
+    due_date: formatDate(data.due_date),
+    start_date: formatDate(data.start_date),
     points: handleString(data.points),
     //time_estimate: handleString(data.time_estimate),
     //time_spent: handleString(data.time_spent),
