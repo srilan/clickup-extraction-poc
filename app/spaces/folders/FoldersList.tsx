@@ -34,35 +34,44 @@ const FoldersList: React.FC<FoldersListProps> = ({ foldersL, folders, lists, fol
 
 const FolderItem = ({folder} : {folder:Folder}) => {
   const [loading, setLoading] = useState(false);
-  const extractFolderData = (id : string, name: string) => {
+  const extractFolderData = async (id : string, name: string) => {
     setLoading(true);
-    fetch(`/api/export/download?folderId=${id}`)
-    .then( res => res.text())
-    .then( blob => {
-      //var file = window.URL.createObjectURL(blob);
-      //window.location.assign(file);
-      const url = window.URL.createObjectURL(
-        new Blob([blob]),
-      );
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute(
-        'download',
-        `${name}_${new Date().toLocaleTimeString()}.csv`,
-      );
-  
-      // Append to html link element page
-      document.body.appendChild(link);
-  
-      // Start download
-      link.click();
-  
-      // Clean up and remove the link
-      if(link.parentNode)
-        link.parentNode.removeChild(link);
-    }).finally(()=> {
-      setLoading(false)
-    });
+    let tasks = "";
+    let data = {
+      last_page: false,
+      data: "",
+    };
+    let page = 0;
+    do {
+      data = await fetch(`/api/export/download?folderId=${id}&page=${page}`)
+      .then( res => res.json());
+      tasks = tasks  +  data.data + "\n";
+      page++;
+    } while(!data.last_page)
+    
+    //var file = window.URL.createObjectURL(blob);
+    //window.location.assign(file);
+    const url = window.URL.createObjectURL(
+      new Blob([tasks]),
+    );
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute(
+      'download',
+      `${name}_${new Date().toLocaleTimeString()}.csv`,
+    );
+
+    // Append to html link element page
+    document.body.appendChild(link);
+
+    // Start download
+    link.click();
+
+    // Clean up and remove the link
+    if(link.parentNode)
+      link.parentNode.removeChild(link);
+    
+    setLoading(false);
   }
   return (
       <div

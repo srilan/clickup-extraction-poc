@@ -10,18 +10,17 @@ type Data = {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse
 ) {
   if (req.method === "GET") {
     const id = req.query.folderId
+    const page = req.query.page
     if (id) {
-      const fileName = await download(id as string);
+      const data = await download(id as string, page as string);
       //const csvFile = fs.readFileSync(fileName);
       res
       .status(200)
-      .setHeader("Content-Type", "text/csv")
-      .setHeader("Content-Disposition", `attachment; filename="test.csv"`)
-      .send(fileName as unknown as Data);
+      .json(data);
     } else {
       res.status(400).json({
         message: "Invalid Folder ID"

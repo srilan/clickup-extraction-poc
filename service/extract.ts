@@ -33,33 +33,24 @@ export const extractByTask = async (id: string) => {
     const taskData = await data.json();
   return taskData;
 }
-export const extractByList = async (id: string) => {
+export const extractByList = async (id: string, page?: string) => {
 
   /**
    * get task details
    */
-  let page = 0;
-  let last = false;
-  let taskData: never[] = [];
-  while(!last && page < 20) {
-    console.log("Extracting page", page)
-    const listEndPoint = `${clickUpEndPoint}/list/${id}/task?archived=false&subtasks=true&page=${page}`;
-    const data = await fetch(listEndPoint, {
-      headers: {
-        Authorization: `${process.env.NEXT_CLICKUP_PUBLIC_KEY}`
-      }
-    })
-    const currPage = await data.json()
-    last = currPage.last_page;
-    if (currPage.last_page) {
-      last = true;
-    } else {
-      last = false;
+  let pageQuery = page ? `&page=${page}`: '';
+  console.log(page)
+  const listEndPoint = `${clickUpEndPoint}/list/${id}/task?archived=false&subtasks=true${pageQuery}`;
+  const data = await fetch(listEndPoint, {
+    headers: {
+      Authorization: `${process.env.NEXT_CLICKUP_PUBLIC_KEY}`
     }
-    taskData = taskData.concat(currPage.tasks);
-    page++;
-  }
-  return taskData;
+  }).then((r) => {
+    return r.json();
+  }).catch((e) => {
+    console.log("error", e)
+  })
+  return data;
 }
 const handleString = (val: string | undefined) => {
   if (val) {
@@ -176,7 +167,6 @@ export const addCustomFields = (data: any) => {
     let value = "";
     if (v && v.value) {
       if (v.value.length > 0 && Array.isArray(v.value)) {
-        console.log("v", v.value)
         const fromOptions = v.value.map((v: string) => {
           const opt = c.options?.find(o=>o.id == v);
           return opt?.name;
@@ -193,7 +183,7 @@ export const addCustomFields = (data: any) => {
   return output;
 }
 
-export const writeExtracted = async (data: any[], fileName: string) => {
+export const writeExtracted = async (data: any[], fileName: string, page?: string) => {
   fileName = fileName.replaceAll(" ", "_");
   fileName = fileName.replace(/[/\\?%*:|"<>]/g, '-');
   fileName += `_${new Date().getTime()}`
@@ -207,7 +197,9 @@ export const writeExtracted = async (data: any[], fileName: string) => {
   */
   const tasks = data.map(async d=> { return await formatData(d) })
   const doneTasks = await Promise.all(tasks);
-  const csv = json2csv(doneTasks);
+  const csv = json2csv(doneTasks, {
+    prependHeader: page == "0" || !page ? true: false, 
+  });
   const location = join(__dirname, `${fileName}.csv`)
   //await writeFileSync(location, csv, {
   //  flag: 'w',
@@ -218,9 +210,13 @@ export const writeExtracted = async (data: any[], fileName: string) => {
 export const extract = async (folderId: string) => {
   const { lists, name } = await getListsByFolder(folderId);
   let tasks: any[] = [];
+  let lastPage = false;
   const taskData = lists.map(async (l: any)=> {
     const list = await extractByList(l.id);
-    return list;
+    if (list.last_page) {
+      lastPage = true;
+    }
+    return list.tasks;
   });
   await Promise.all(taskData).then((res)=> {
     res.forEach((task:any) => {
@@ -233,20 +229,27 @@ export const extract = async (folderId: string) => {
 }
 
 
-export const download = async (folderId: string) => {
+export const download = async (folderId: string, page?: string) => {
   const { lists, name } = await getListsByFolder(folderId);
   let tasks: any[] = [];
+  let lastPage = true;
   const taskData = lists.map(async (l: any)=> {
-    const list = await extractByList(l.id);
-    return list;
+    const list = await extractByList(l.id, page);
+    if (!list.last_page) {
+      lastPage = false;
+    }
+    return list.tasks;
   });
   const res = await Promise.all(taskData).then((res)=> {
     res.forEach((task:any) => {
       tasks = tasks.concat(task)
     });
-    return writeExtracted(tasks, name);
+    return writeExtracted(tasks, name, page);
   }).finally(()=>{
     console.log("completed")
   });
-  return res;
+  return {
+    last_page: lastPage,
+    data: res
+  };
 }
