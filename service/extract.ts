@@ -40,7 +40,7 @@ export const extractByList = async (id: string) => {
    */
   let page = 0;
   let last = false;
-  let taskData: [] = [];
+  let taskData: never[] = [];
   while(!last) {
     console.log("Extracting page", page)
     const listEndPoint = `${clickUpEndPoint}/list/${id}/task?archived=false&subtasks=true&page=${page}`;
