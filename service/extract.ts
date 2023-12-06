@@ -13,24 +13,24 @@ export const clickUpEndPoint = process.env.NEXT_CLICKUP_URL || '';
 
 
 export const getListsByFolder = async (folderId: string) => {
-  const taskEndPoint = `${clickUpEndPoint}/folder/${folderId}?archived=false`;
-  const data = await fetch(taskEndPoint, {
-    headers: {
-      Authorization: `${process.env.NEXT_CLICKUP_PUBLIC_KEY}`
-    }
-  })
-  const taskData = await data.json();
+    const taskEndPoint = `${clickUpEndPoint}/folder/${folderId}?archived=false`;
+    const data = await fetch(taskEndPoint, {
+      headers: {
+        Authorization: `${process.env.NEXT_CLICKUP_PUBLIC_KEY}`
+      }
+    })
+    const taskData = await data.json();
   return taskData;
 }
 
 export const extractByTask = async (id: string) => {
   const taskEndPoint = `${clickUpEndPoint}/task/${id}?archived=false`;
-  const data = await fetch(taskEndPoint, {
-    headers: {
-      Authorization: `${process.env.NEXT_CLICKUP_PUBLIC_KEY}`
-    }
-  })
-  const taskData = await data.json();
+    const data = await fetch(taskEndPoint, {
+      headers: {
+        Authorization: `${process.env.NEXT_CLICKUP_PUBLIC_KEY}`
+      }
+    })
+    const taskData = await data.json();
   return taskData;
 }
 export const extractByList = async (id: string) => {
@@ -38,14 +38,23 @@ export const extractByList = async (id: string) => {
   /**
    * get task details
    */
-  const listEndPoint = `${clickUpEndPoint}/list/${id}/task?archived=false&subtasks=true`;
-  const data = await fetch(listEndPoint, {
-    headers: {
-      Authorization: `${process.env.NEXT_CLICKUP_PUBLIC_KEY}`
-    }
-  })
-  const list = await data.json();
-  return list;
+  let page = 0;
+  let last = false;
+  let taskData: [] = [];
+  while(!last) {
+    console.log("Extracting page", page)
+    const listEndPoint = `${clickUpEndPoint}/list/${id}/task?archived=false&subtasks=true&page=${page}`;
+    const data = await fetch(listEndPoint, {
+      headers: {
+        Authorization: `${process.env.NEXT_CLICKUP_PUBLIC_KEY}`
+      }
+    })
+    const currPage = await data.json()
+    last = currPage.last_page;
+    taskData = taskData.concat(currPage.tasks);
+    page++;
+  }
+  return taskData;
 }
 const handleString = (val: string | undefined) => {
   if (val) {
@@ -206,7 +215,7 @@ export const extract = async (folderId: string) => {
   let tasks: any[] = [];
   const taskData = lists.map(async (l: any)=> {
     const list = await extractByList(l.id);
-    return list.tasks;
+    return list;
   });
   await Promise.all(taskData).then((res)=> {
     res.forEach((task:any) => {
@@ -224,7 +233,7 @@ export const download = async (folderId: string) => {
   let tasks: any[] = [];
   const taskData = lists.map(async (l: any)=> {
     const list = await extractByList(l.id);
-    return list.tasks;
+    return list;
   });
   const res = await Promise.all(taskData).then((res)=> {
     res.forEach((task:any) => {
