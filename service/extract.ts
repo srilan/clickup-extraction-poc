@@ -41,7 +41,7 @@ export const extractByList = async (id: string) => {
   let page = 0;
   let last = false;
   let taskData: never[] = [];
-  while(!last) {
+  while(!last && page < 20) {
     console.log("Extracting page", page)
     const listEndPoint = `${clickUpEndPoint}/list/${id}/task?archived=false&subtasks=true&page=${page}`;
     const data = await fetch(listEndPoint, {
@@ -51,6 +51,11 @@ export const extractByList = async (id: string) => {
     })
     const currPage = await data.json()
     last = currPage.last_page;
+    if (currPage.last_page) {
+      last = true;
+    } else {
+      last = false;
+    }
     taskData = taskData.concat(currPage.tasks);
     page++;
   }
