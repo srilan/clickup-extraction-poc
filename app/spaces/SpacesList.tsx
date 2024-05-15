@@ -119,7 +119,7 @@ const SpacesList: React.FC<SpacesListProps> = ({
             onClick={() => toggleSpaces(space.id, index)}
           >
             <div className={`w-10 border-r px-2 `}>
-              <div className={`text-black dark:text-white transform transition duration-500 ease-in-out ${space.spacesOpen ? 'rotate-180' : ''}`}>
+              <div className={` dark:text-black transform transition duration-500 ease-in-out ${space.spacesOpen ? 'rotate-180' : ''}`}>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 15.75l-7.5-7.5-7.5 7.5" />
                   </svg>
