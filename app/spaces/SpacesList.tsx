@@ -77,8 +77,11 @@ const SpacesList: React.FC<SpacesListProps> = ({
   }
   return (
   <>
-  {/* Checks if spaces is accessible, since we lose access to everything if the response 
-  from spaces/get is an empty array, we go directly to the folders.*/}
+  {/* 
+    Checks if spaces is accessible, if we lose access to spaces, we go directly to the folders. 
+    Update 5/15/2024 - I've added a new feature to the top level page that allows to view accessible folders instead.
+    Gonna keep this fix though just in case. -A
+  */}
     {spaces.length === 0 ? (
       folders.map((folder, index) => (
         <div key={index}>

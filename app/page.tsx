@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react'
 import { Folder, FolderData } from '@/models/folder';
 import { List, ListData } from '@/models/list';
 import SpacesList from './spaces/SpacesList';
+import Dropdown from '@/components/ui/dropdown';
+import FoldersList from './spaces/folders/FoldersList';
 
 interface SelectedId {
   id: string,
@@ -19,6 +21,7 @@ export default function Home() {
   const [lists, setList] = useState<Array<List>>([]);
   const [workspaceFolders, setWorkspaceFolders] = useState<{ [key: string]: Folder[] }>({});
   const [folderLists, setFolderLists] = useState<{ [key: string]: List[] }>({});
+  const [listOnly, setListOnly] = useState<Array<List>>([]);
 
   useEffect(()=> {
     fetch("/api/spaces/get").then(async (data)=> {
@@ -44,8 +47,20 @@ export default function Home() {
       setList(listData.lists);
     };
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    //setListOnly
+    const fetchData = async () => {
+      const response = await fetch('/api/list/getAll');
+      const listData: ListData = await response.json();
+      console.log('Lists data:', listData);
+      setListOnly(listData.lists);
+    };
+    fetchData();
     
   }, []);
+  
 
   const toggleSpaces = async (spaceId: string, index: number) => {
     if (!workspaceFolders[spaceId]) {
@@ -117,17 +132,28 @@ export default function Home() {
       />
     </div>
 
-      <div className="items-center mb-32 grid text-center lg:w-full lg:mb-0 lg:text-left">
-      <SpacesList
-        spaces={spaces}
-        folders={folders}
-        lists={lists}
-        workspaceFolders={workspaceFolders}
-        folderLists={folderLists}
-        toggleSpaces={toggleSpaces}
-        toggleFolders={toggleFolders}
-      />
-      
+      <div className="items-center mb-32 grid text-center lg:w-full lg:mb-0 lg:text-left space-y-5">
+        <Dropdown text='Spaces'>
+          <SpacesList
+            spaces={spaces}
+            folders={folders}
+            lists={lists}
+            workspaceFolders={workspaceFolders}
+            folderLists={folderLists}
+            toggleSpaces={toggleSpaces}
+            toggleFolders={toggleFolders}
+          />
+        </Dropdown>
+
+        <Dropdown text='Folders'>
+            <FoldersList foldersL={folders} folders={folders} lists={lists} folderLists={folderLists} toggleFolders={toggleFolders} />
+        </Dropdown>
+
+        {/* add list here */}
+        <Dropdown text='Lists'>
+          <div> Insert List Here </div>
+        </Dropdown>
+
       </div>
     </main>
   )
