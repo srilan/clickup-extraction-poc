@@ -7,6 +7,7 @@ import { List, ListData } from '@/models/list';
 import SpacesList from './spaces/SpacesList';
 import Dropdown from '@/components/ui/dropdown';
 import FoldersList from './spaces/folders/FoldersList';
+import ListTasks from './spaces/folders/lists/ListTasks';
 
 interface SelectedId {
   id: string,
@@ -151,7 +152,8 @@ export default function Home() {
 
         {/* add list here */}
         <Dropdown text='Lists'>
-          <div> Insert List Here </div>
+          <ListTasks listsL={listOnly} lists={listOnly} listTasks={folderLists} toggleFolders={toggleFolders} />
+          
         </Dropdown>
 
       </div>
