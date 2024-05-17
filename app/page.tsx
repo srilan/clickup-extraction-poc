@@ -8,6 +8,7 @@ import SpacesList from './spaces/SpacesList';
 import Dropdown from '@/components/ui/dropdown';
 import FoldersList from './spaces/folders/FoldersList';
 import ListTasks from './spaces/folders/lists/ListTasks';
+import { extractByList } from '@/service/extract';
 
 interface SelectedId {
   id: string,
@@ -61,6 +62,8 @@ export default function Home() {
     fetchData();
     
   }, []);
+
+
   
 
   const toggleSpaces = async (spaceId: string, index: number) => {
@@ -115,8 +118,32 @@ export default function Home() {
     );
   };
   
-  
+  const handleDownloadClick = async (id: string) => {
+    await extractListFromFolder(id);
+  }
 
+  const extractListFromFolder = async (isId:string) => {
+    console.log('AWAYOOH')
+    const data = await fetch('/api/export/lists', {
+      method: 'POST',
+      body: JSON.stringify({ id: isId }),
+      headers: {
+          'Content-Type': 'application/json',
+      },
+  });
+
+    const listData = await data.json();
+    console.log('DAta')
+    // Check if the response contains CSV data
+    if (listData.message) {
+        // Create an anchor element
+        const anchor = document.createElement('a');
+        anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(listData.message);
+        anchor.download = `${name}_${new Date().toLocaleTimeString()}.csv`;
+        // Trigger a click event on the anchor element to initiate download
+        anchor.click();
+    }
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
@@ -153,7 +180,10 @@ export default function Home() {
         {/* add list here */}
         <Dropdown text='Lists'>
           <ListTasks listsL={listOnly} lists={listOnly} listTasks={folderLists} toggleFolders={toggleFolders} />
-          
+        </Dropdown>
+
+        <Dropdown text='Roadmap Leah'>
+          <button className='text-black hover:underline' onClick={()=>handleDownloadClick("901103287599")}> Download </button>
         </Dropdown>
 
       </div>
